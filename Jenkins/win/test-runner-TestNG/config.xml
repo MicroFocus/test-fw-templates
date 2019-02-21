@@ -1,0 +1,70 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>testsToRun</name>
+          <description>for details about this parameter, see the information about &quot;Micro Focus ALM Octane testing framework converter&quot;
+            build step.
+            if you want to run this job using Jenkins, you can use this values:
+            * v1:com.hp.devops.demoapp.tests.ui|TestA|testUIcaseAlwaysPass;com.hp.devops.demoapp.tests.ui|TestB|testUIcaseD;
+            * v1:com.hp.devops.demoapp.tests.ui|TestA|testUIcaseAlwaysPass;
+            * v1:com.hp.devops.demoapp.tests.ui|TestSuiteB|testCaseA; com.hp.devops.demoapp.tests.ui|TestC|testUIcaseE;com.hp.devops.demoapp.tests.ui|TestC|testUIcaseF;          </description>
+          <defaultValue></defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.8.0">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>http://github.com/gullerya/hpe-demo-app.git</url>
+        <credentialsId>9da41900-705b-434a-b96b-8f8cbd69f244</credentialsId>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <com.microfocus.application.automation.tools.octane.testrunner.TestsToRunConverterBuilder plugin="hp-application-automation-tools-plugin@5.6.4-beta">
+      <framework>
+        <framework>mvnSurefire</framework>
+      </framework>
+      <TESTS__TO__RUN__PARAMETER>testsToRun</TESTS__TO__RUN__PARAMETER>
+      <TESTS__TO__RUN__CONVERTED__PARAMETER>testsToRunConverted</TESTS__TO__RUN__CONVERTED__PARAMETER>
+      <DEFAULT__EXECUTING__DIRECTORY>${workspace}</DEFAULT__EXECUTING__DIRECTORY>
+      <CHECKOUT__DIRECTORY__PARAMETER>testsToRunCheckoutDirectory</CHECKOUT__DIRECTORY__PARAMETER>
+    </com.microfocus.application.automation.tools.octane.testrunner.TestsToRunConverterBuilder>
+    <hudson.tasks.BatchFile>
+      <command>echo going to run the following tests: $testsToRunConverted&#xd;
+&quot;C:\Program Files\Apache\Maven\bin\mvn&quot; -Dtest=%testsToRunConverted% test -fn -DfailIfNoTests=false </command>
+    </hudson.tasks.BatchFile>
+  </builders>
+  <publishers>
+    <hudson.tasks.junit.JUnitResultArchiver plugin="junit@1.24">
+      <testResults>**/surefire-reports/TEST-*.xml</testResults>
+      <keepLongStdio>false</keepLongStdio>
+      <healthScaleFactor>1.0</healthScaleFactor>
+      <allowEmptyResults>false</allowEmptyResults>
+    </hudson.tasks.junit.JUnitResultArchiver>
+  </publishers>
+  <buildWrappers/>
+</project>
